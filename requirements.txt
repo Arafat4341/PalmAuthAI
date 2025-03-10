@@ -1,0 +1,7 @@
+opencv-python
+numpy
+mediapipe
+torch
+torchvision
+flask
+psycopg2-binary
