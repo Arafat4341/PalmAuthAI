@@ -7,8 +7,10 @@ PalmAuthAI is a **real-time palm recognition system** that uses **computer visio
 3.11.4
 
 ## Feature extraction
-We will start the feature extraction by detecting the keypoint localization of 21 hand-knuckle coordinates within the detected hand regions. We will call them **21 Palm Landmark Points** for simplicity. This method is introduced by Google's MediaPipe.
+1. We will start the feature extraction by detecting the keypoint localization of 21 hand-knuckle coordinates within the detected hand regions. We will call them **21 Palm Landmark Points** for simplicity. This method is introduced by Google's MediaPipe.
 If you want to know more about **21 Palm Landmark Points**  refer to this: [Hand Landmark Detection Guide](https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker)
+
+2. After that we also extract HOG Features (from grayscale palm image) → Captures palm texture.
 
 So the current feature extraction does the following:
 - Extracts 21 Palm Landmark points realtime from camera (x, y, z coordinates).
@@ -16,3 +18,5 @@ So the current feature extraction does the following:
     - Z represents depth (how far the point is from the camera).
 - Flatten them into a 1D array
 - Normalizes the co-ordinate values (subtract the mean & scale by standard deviation) to make them independent of hand size & position.
+- Extract HOG Features (from grayscale palm image)
+- Combine Palm Landmarks & HOG Features into a Single Feature Vector
