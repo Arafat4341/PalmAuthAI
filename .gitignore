@@ -2,3 +2,5 @@ palmai_venv
 *.npy
 *.pkl
 *.db
+data
+models
