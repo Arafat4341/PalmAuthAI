@@ -1,3 +1,4 @@
 palmai_venv
-*npy
-*pkl
+*.npy
+*.pkl
+*.db
