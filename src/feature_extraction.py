@@ -1,7 +1,13 @@
 import cv2
 import mediapipe as mp
 import numpy as np
+import os
 from skimage.feature import hog
+
+# Ask for user ID before starting
+user_name = input("Enter user name: ")
+data_dir = "data/"
+os.makedirs(data_dir, exist_ok=True)  # Ensure data directory exists
 
 # Initialize MediaPipe Hand Tracking
 mp_hands = mp.solutions.hands
@@ -9,7 +15,7 @@ hands = mp_hands.Hands(min_detection_confidence=0.7, min_tracking_confidence=0.7
 mp_draw = mp.solutions.drawing_utils
 
 def extract_palm_landmarks(frame):
-    """Extracts 21 palm landmark coordinates and normalizes them."""
+    """Extracts palm landmark coordinates and normalizes them."""
     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     results = hands.process(rgb_frame)
 
@@ -37,9 +43,9 @@ def extract_hog_features(image):
 
     return hog_features
 
-# Capture palm features and combine them
+# Start webcam capture
 cap = cv2.VideoCapture(0)
-saved_features = None
+sample_count = 1  # Track number of samples collected
 
 while cap.isOpened():
     ret, frame = cap.read()
@@ -52,24 +58,21 @@ while cap.isOpened():
 
     if palm_landmarks is not None and hog_features is not None:
         combined_features = np.concatenate((palm_landmarks, hog_features))  # Merge both
+        # print(f"Palm detected. Press 's' to save sample {sample_count}.")
 
-        cv2.putText(frame, "Press 'S' to Save Features", (50, 50), 
+        cv2.putText(frame, f"User {user_name}: Press 'S' to Save Sample {sample_count}", (30, 50), 
                     cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
 
     cv2.imshow("Palm Feature Extraction", frame)
 
     key = cv2.waitKey(1) & 0xFF
     if key == ord('s') and palm_landmarks is not None and hog_features is not None:
-        saved_features = combined_features
-        print("✅ Combined Palm Features Saved:", saved_features)
-        break  # Exit after saving
+        file_name = f"{user_name}_{sample_count:02d}.npy"
+        np.save(os.path.join(data_dir, file_name), combined_features)
+        print(f"✅ Sample {sample_count} saved as {file_name}")
+        sample_count += 1  # Increment sample count
     elif key == ord('q'):
         break  # Quit without saving
 
 cap.release()
 cv2.destroyAllWindows()
-
-# Save the features for training
-if saved_features is not None:
-    np.save("combined_palm_features.npy", saved_features)
-    print("✅ Features saved to combined_palm_features.npy")
